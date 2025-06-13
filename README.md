@@ -1,107 +1,92 @@
-# Proyecto "Valenbisi × Calidad del Aire 2022"
+# Proyecto **Valenbisi × Calidad del Aire 2022**
 
-> **Estado**: *Pipeline de descarga, limpieza y agregación completado* (👷‍♀️ listo para análisis y app Streamlit)
-
----
-
-## 1 · Resumen rápido
-
-Este proyecto investiga la relación entre **uso de bicicleta compartida (Valenbisi)** y **contaminación atmosférica** en la ciudad de Valencia durante 2022.
-
-🔹 *Granularidad "ciudad"*: mes × día‑de‑la‑semana × hora (2 016 filas)
-
-🔹 *Granularidad "estación"*: estación Valenbisi × hora (≈ 6 600 filas) enlazada a la estación de calidad del aire más cercana.
-
-El ETL completa la descarga de datos abiertos, la normalización y la fusión en CSV listos para ciencia de datos y visualización.
+> **Estado**: *ETL estable* — datasets limpios y validados listos para EDA y app Streamlit
 
 ---
 
-## 2 · Cómo ejecutar el pipeline
+## 1 · Resumen rápido
+
+Investigamos la relación entre el **uso de Valenbisi** y la **contaminación atmosférica** en València (2022).
+
+* **Granularidad ciudad** → mes × día‑de‑la‑semana × hora (2 016 filas)
+* **Granularidad estación** → estación Valenbisi × hora (6 532 filas) enlazada a la estación de aire más cercana.
+
+---
+
+## 2 · Ejecutar el pipeline
 
 ```bash
-# 0 · Clonar repo y entrar
-pip install -r requirements.txt   # pandas, requests, tqdm, python-dateutil, scipy
+# Clonar repo y entrar
+pip install -r requirements.txt  # pandas, requests, scipy, tqdm …
 
-# 1 · Colocar los .txt horarios de aire 2022 en:
+# Colocar .txt de aire 2022
 mkdir air_txt
-# (copiar aquí los ficheros descargados manualmente de la web de la Generalitat)
+# (pega aquí los 12 ficheros descargados de la Generalitat)
 
-# 2 · Lanzar el script principal
+# Lanzar el ETL
 python build_valencia_bike_air_2022.py
 ```
 
-El script descargará automáticamente los datasets de Valenbisi y procesará todos los `.txt` de `air_txt/`.
+El script descarga los datasets Valenbisi, procesa `air_txt/` y valida los CSV finales.
 
 ---
 
-## 3 · Estructura de carpetas
+## 3 · Estructura de carpetas
 
 ```
 📂 data/
-   ├─ bike_city_agg_2022.csv           # Bici ciudad  (2 016 filas)
-   ├─ air_city_agg_2022.csv            # Aire ciudad  (2 016 filas)
-   ├─ city_bike_air_2022.csv           # Merge ciudad
-   ├─ bike_station_hour_2022.csv       # Bici por estación‑hora
-   ├─ air_station_hour_2022.csv        # Aire por estación‑hora (full serie)
-   ├─ stations_crosswalk.csv           # Emparejamiento bici ↔ aire + distancia
-   └─ bike_air_spatial_hour_2022.csv   # Merge espacial
-📂 air_txt/            # (input) ficheros .txt horarios 2022 por estación de aire
-build_valencia_bike_air_2022.py        # Script ETL principal
+   ├─ bike_city_agg_2022.csv           # Bici ciudad (2 016 × 5)
+   ├─ air_city_agg_2022.csv            # Aire ciudad (2 016 × 10)
+   ├─ city_bike_air_2022.csv           # Merge ciudad (2 016 × 12)
+   ├─ bike_station_hour_2022.csv       # Bici estación‑hora (6 609 × 4)
+   ├─ air_station_hour_2022.csv        # Aire estación‑hora (104 412 × 24)
+   ├─ stations_crosswalk.csv           # Emparejamiento bici↔aire (273 × 5)
+   └─ bike_air_spatial_hour_2022.csv   # Merge espacial (6 532 × 9)
+📂 air_txt/  # ficheros de aire 2022
+build_valencia_bike_air_2022.py        # Script ETL
 README.md                               # Este documento
 ```
 
 ---
 
-## 4 · Descripción de los outputs clave
+## 4 · Descripción de outputs clave
 
-| Archivo                                | Granularidad             | Columnas principales                                                                 |
-| -------------------------------------- | ------------------------ | ------------------------------------------------------------------------------------ |
-| **city\_bike\_air\_2022.csv**          | mes, dow, hora           | `bike_trips`, `bike_dur_tot`, `NO2`, `PM10`, `PM2.5`, `NOx`, `O3`, `Veloc.`, `Temp.` |
-| **bike\_air\_spatial\_hour\_2022.csv** | estación Valenbisi, hora | `prestamos_mean`, `NO2`, `PM10`, `PM2.5`, `dist_km`, `lat`, `lon`                    |
+| CSV                                    | Clave primaria          | Columnas destacadas                                                        |
+| -------------------------------------- | ----------------------- | -------------------------------------------------------------------------- |
+| **city\_bike\_air\_2022.csv**          | `month, dow, hour`      | `bike_trips`, `bike_dur_tot`, **NO₂**, PM₁₀, PM₂.₅, NOx, O₃, viento, temp. |
+| **bike\_air\_spatial\_hour\_2022.csv** | `codigo_estacion, hour` | `prestamos_mean`, **NO₂**, PM₁₀, PM₂.₅, `dist_km`, `lat`, `lon`            |
 
-Nota: los contaminantes son medias de todas las estaciones de aire en la ciudad (nivel ciudad) o de la estación más cercana (nivel estación).
-
----
-
-## 5 · Siguientes pasos propuestos
-
-1. **Exploración básica (EDA)**
-
-   * Serie temporal `bike_trips` vs `NO2`.
-   * Heatmap hora × día de la semana.
-2. **Correlaciones ciudad‑nivel**
-
-   * Pearson/Spearman entre viajes y contaminantes.
-3. **Modelo lineal multivariante**
-
-   * `NO2 ~ bike_trips + Veloc. + Temp.`
-4. **Mapa interactivo (fase espacial)**
-
-   * Burbujas tamaño ∝ viajes, color ∝ NO₂; slider de hora.
-5. **Streamlit App skeleton**
-
-   * Sidebar → rango de fechas, contaminante.
-   * Tabs → Visión general · Mapas · Modelado · Predicción (opcional).
+*Contaminantes a nivel ciudad = media de 12 estaciones. A nivel estación = datos de la estación de aire más cercana.*
 
 ---
 
-## 6 · Tareas pendientes / TODO
+## 5 · Próximos pasos sugeridos
 
-* [ ] Validar que los `.txt` de todas las estaciones 2022 están completos (sin días faltantes).
-* [ ] Revisar `dist_km` > 2 km → decidir si excluir o reasignar.
-* [ ] Documentar significado de columnas menos obvias (`bike_dur_tot`).
-* [ ] Escribir `requirements.txt` definitivo.
-* [ ] Commits iniciales y push a GitHub.
-
----
-
-## 7 · Bitácora de trabajo
-
-| Fecha          | Avance                                  | Notas                                                                      |
-| -------------- | --------------------------------------- | -------------------------------------------------------------------------- |
-| 2025‑06‑12     | Se creó y ejecutó el pipeline completo. | Script `build_valencia_bike_air_2022.py` funcionando y datasets generados. |
-| Próxima sesión | EDA + primeros gráficos.                | Cargar `city_bike_air_2022.csv` en notebook / Streamlit.                   |
+1. **EDA** — series temporales y heatmaps.
+2. **Correlaciones** ciudad‑nivel.
+3. **Modelo lineal**: `NO2 ~ bike_trips + Veloc + Temp`.
+4. **Mapa interactivo** con burbujas.
+5. **App Streamlit** con sidebar y pestañas.
 
 ---
 
-> **Tip**: si te pierdes, simplemente vuelve a lanzar `python build_valencia_bike_air_2022.py` – tardará \~1‑2 min y recreará todo desde cero.
+## 6 · TODO
+
+* [ ] Verificar huecos en los `.txt` de aire.
+* [ ] Revisar estaciones con `dist_km > 2` km.
+* [ ] Documentar `bike_dur_tot`.
+* [ ] Completar `requirements.txt`.
+* [ ] Iniciar app Streamlit.
+
+---
+
+## 7 · Bitácora
+
+| Fecha      | Avance                                   | Notas                |
+| ---------- | ---------------------------------------- | -------------------- |
+| 2025‑06‑13 | ETL consolidado con cross‑walk funcional | 6 CSV validados      |
+| Próxima    | EDA + visualizaciones                    | Notebook / Streamlit |
+
+>
+
+**Tip**: borra `data/` y vuelve a lanzar `python build_valencia_bike_air_2022.py` para recrear todo en \~2 min.
