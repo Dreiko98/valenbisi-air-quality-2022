@@ -82,11 +82,10 @@ README.md                               # Este documento
 
 ## 7 · Bitácora
 
-| Fecha      | Avance                                   | Notas                |
-| ---------- | ---------------------------------------- | -------------------- |
-| 2025‑06‑13 | ETL consolidado con cross‑walk funcional | 6 CSV validados      |
-| Próxima    | EDA + visualizaciones                    | Notebook / Streamlit |
+| Fecha      | Avance                                      | Notas                                                 |
+| ---------- | ------------------------------------------- | ----------------------------------------------------- |
+| 2025‑06‑12 | Pipeline inicial construido y ejecutado.    | primer ETL completo, CSVs generados.                  |
+| 2025‑06‑13 | Validación de CSVs + corrección cross‑walk. | 6 532 filas espaciales correctas, README actualizado. |
+| Próxima    | EDA + primeras visualizaciones.             | Notebook / Streamlit.                                 |
 
->
-
-**Tip**: borra `data/` y vuelve a lanzar `python build_valencia_bike_air_2022.py` para recrear todo en \~2 min.
+> **Tip**: borra `data/` y vuelve a lanzar `python build_valencia_bike_air_2022.py` para recrear todo en \~2 min.
