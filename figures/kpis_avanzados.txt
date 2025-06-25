@@ -1,0 +1,4 @@
+Mayor NO2: mes=1.0, dow=3.0, hora=21.0, valor=70.14
+Menor NO2: mes=11.0, dow=4.0, hora=3.0, valor=4.53
+Mayor viajes bici: mes=10.0, dow=0.0, hora=14.0, valor=31552
+Menor viajes bici: mes=1.0, dow=2.0, hora=4.0, valor=144

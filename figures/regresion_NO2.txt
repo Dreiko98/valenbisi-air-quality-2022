@@ -1,0 +1,5 @@
+Intercept: 19.67
+Coef bike_trips: 0.0005
+Coef Veloc: 0.0525
+Coef Temp: -0.0676
+R2: 0.1188
