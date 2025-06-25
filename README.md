@@ -1,91 +1,97 @@
-# Proyecto **Valenbisi × Calidad del Aire 2022**
+# Valenbisi × Air Quality 2022
 
-> **Estado**: *ETL estable* — datasets limpios y validados listos para EDA y app Streamlit
-
----
-
-## 1 · Resumen rápido
-
-Investigamos la relación entre el **uso de Valenbisi** y la **contaminación atmosférica** en València (2022).
-
-* **Granularidad ciudad** → mes × día‑de‑la‑semana × hora (2 016 filas)
-* **Granularidad estación** → estación Valenbisi × hora (6 532 filas) enlazada a la estación de aire más cercana.
+> **Dashboard interactivo para analizar la relación entre el uso de la bici pública y la calidad del aire en València (2022)**
 
 ---
 
-## 2 · Ejecutar el pipeline
+## 🚲 Descripción del proyecto
 
-```bash
-# Clonar repo y entrar
-pip install -r requirements.txt  # pandas, requests, scipy, tqdm …
-
-# Colocar .txt de aire 2022
-mkdir air_txt
-# (pega aquí los 12 ficheros descargados de la Generalitat)
-
-# Lanzar el ETL
-python build_valencia_bike_air_2022.py
-```
-
-El script descarga los datasets Valenbisi, procesa `air_txt/` y valida los CSV finales.
+Este proyecto explora la relación entre la movilidad sostenible (uso de Valenbisi) y la contaminación atmosférica en la ciudad de València durante 2022, utilizando datos abiertos. Incluye un pipeline ETL propio, análisis exploratorio de datos (EDA) y un dashboard profesional e interactivo desarrollado con Streamlit.
 
 ---
 
-## 3 · Estructura de carpetas
+## 🌟 Beneficios y motivación
+- Facilita la toma de decisiones basadas en datos para ciudadanía y administración.
+- Permite identificar patrones de movilidad y su impacto en la calidad del aire.
+- Herramienta visual, intuitiva y reproducible para fomentar políticas de transporte sostenible.
+
+---
+
+## 📊 Funcionalidades principales
+- **KPIs** de movilidad y contaminación.
+- Series temporales y heatmaps interactivos.
+- Mapas de estaciones y comparativas espaciales.
+- Matriz de correlación y modelo de regresión lineal.
+- Comparativas entre días laborables y fines de semana.
+- Filtros y visualizaciones interactivas.
+
+---
+
+## 🗂️ Estructura del repositorio
 
 ```
 📂 data/
-   ├─ bike_city_agg_2022.csv           # Bici ciudad (2 016 × 5)
-   ├─ air_city_agg_2022.csv            # Aire ciudad (2 016 × 10)
-   ├─ city_bike_air_2022.csv           # Merge ciudad (2 016 × 12)
-   ├─ bike_station_hour_2022.csv       # Bici estación‑hora (6 609 × 4)
-   ├─ air_station_hour_2022.csv        # Aire estación‑hora (104 412 × 24)
-   ├─ stations_crosswalk.csv           # Emparejamiento bici↔aire (273 × 5)
-   └─ bike_air_spatial_hour_2022.csv   # Merge espacial (6 532 × 9)
-📂 air_txt/  # ficheros de aire 2022
-build_valencia_bike_air_2022.py        # Script ETL
-README.md                               # Este documento
+   ├─ city_bike_air_2022.csv           # Merge ciudad (mes × día × hora)
+   ├─ bike_air_spatial_hour_2022.csv   # Merge estación-hora
+   ├─ ... (otros CSV intermedios)
+📂 air_txt/                            # Ficheros de aire originales
+app.py                                # Dashboard principal (Streamlit)
+eda_valenbisi_air.py                  # Script de EDA y generación de figuras
+build_valencia_bike_air_2022.py       # Pipeline ETL
+requirements.txt                      # Dependencias
+README.md                             # Este documento
+logo.png, favicon.png                 # Recursos visuales
 ```
 
 ---
 
-## 4 · Descripción de outputs clave
+## 🚀 Cómo ejecutar el dashboard
 
-| CSV                                    | Clave primaria          | Columnas destacadas                                                        |
-| -------------------------------------- | ----------------------- | -------------------------------------------------------------------------- |
-| **city\_bike\_air\_2022.csv**          | `month, dow, hour`      | `bike_trips`, `bike_dur_tot`, **NO₂**, PM₁₀, PM₂.₅, NOx, O₃, viento, temp. |
-| **bike\_air\_spatial\_hour\_2022.csv** | `codigo_estacion, hour` | `prestamos_mean`, **NO₂**, PM₁₀, PM₂.₅, `dist_km`, `lat`, `lon`            |
+### 1. **Requisitos**
+- Python 3.8+
+- Ver dependencias en `requirements.txt`
 
-*Contaminantes a nivel ciudad = media de 12 estaciones. A nivel estación = datos de la estación de aire más cercana.*
+### 2. **Instalación local**
+```bash
+pip install -r requirements.txt
+streamlit run app.py
+```
 
----
-
-## 5 · Próximos pasos sugeridos
-
-1. **EDA** — series temporales y heatmaps.
-2. **Correlaciones** ciudad‑nivel.
-3. **Modelo lineal**: `NO2 ~ bike_trips + Veloc + Temp`.
-4. **Mapa interactivo** con burbujas.
-5. **App Streamlit** con sidebar y pestañas.
-
----
-
-## 6 · TODO
-
-* [ ] Verificar huecos en los `.txt` de aire.
-* [ ] Revisar estaciones con `dist_km > 2` km.
-* [ ] Documentar `bike_dur_tot`.
-* [ ] Completar `requirements.txt`.
-* [ ] Iniciar app Streamlit.
+### 3. **Despliegue online (recomendado)**
+Puedes desplegar la app gratis en [Streamlit Cloud](https://streamlit.io/cloud):
+1. Sube este repositorio a GitHub.
+2. Ve a Streamlit Cloud y crea una nueva app desde tu repo.
+3. Selecciona `app.py` como archivo principal.
+4. Obtendrás un enlace público para compartir tu dashboard.
 
 ---
 
-## 7 · Bitácora
+## 📦 Pipeline de datos
+- **ETL automatizado:** descarga, limpieza, validación y agregación de datos de Valenbisi y calidad del aire.
+- **Outputs clave:**
+  - `city_bike_air_2022.csv`: datos agregados ciudad-hora.
+  - `bike_air_spatial_hour_2022.csv`: datos estación-hora enlazados espacialmente.
 
-| Fecha      | Avance                                      | Notas                                                 |
-| ---------- | ------------------------------------------- | ----------------------------------------------------- |
-| 2025‑06‑12 | Pipeline inicial construido y ejecutado.    | primer ETL completo, CSVs generados.                  |
-| 2025‑06‑13 | Validación de CSVs + corrección cross‑walk. | 6 532 filas espaciales correctas, README actualizado. |
-| Próxima    | EDA + primeras visualizaciones.             | Notebook / Streamlit.                                 |
+---
 
-> **Tip**: borra `data/` y vuelve a lanzar `python build_valencia_bike_air_2022.py` para recrear todo en \~2 min.
+## 🛠️ Tecnologías empleadas
+- **Python** (pandas, scikit-learn, seaborn)
+- **Streamlit** (dashboard interactivo)
+- **Plotly** (visualizaciones interactivas)
+
+---
+
+## 👥 Autores
+- Josep Ferrer García
+- [Germán Mallo Faure](https://germanmallo.com)
+
+---
+
+## 📹 Demo y recursos
+- **Demo online:** [Pon aquí el enlace de tu app desplegada]
+- **Vídeo explicativo:** [Pon aquí el enlace al vídeo demo]
+
+---
+
+## 📄 Licencia
+Proyecto académico para la Universitat Politècnica de València (UPV). Uso libre para fines educativos.
